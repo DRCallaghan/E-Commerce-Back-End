@@ -18,8 +18,9 @@ Product.belongsToMany(Tag, {
   // defining the third table needed to store foreign keys
   through: {
     model: ProductTag,
-    unique: false
+    unique: false,
   },
+  as: 'product_tag'
 });
 // Tags belongToMany Products (through ProductTag)
 Tag.belongsToMany(Product, {
@@ -28,6 +29,7 @@ Tag.belongsToMany(Product, {
     model: ProductTag,
     unique: false
   },
+  as: 'tag_product'
 });
 
 module.exports = {
