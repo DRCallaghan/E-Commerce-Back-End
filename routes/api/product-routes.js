@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
         {
           model: Tag,
           through: ProductTag,
-          as: 'tag_product',
+          as: 'product_of_tag',
         },
         {
           model: Category,
@@ -36,7 +36,7 @@ router.get('/:id', async (req, res) => {
         {
           model: Tag,
           through: ProductTag,
-          as: 'tag_product',
+          as: 'product_of_tag',
         },
         {
           model: Category,
@@ -66,7 +66,7 @@ router.post('/', (req, res) => {
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
-      if (req.body.tagIds.length) {
+      if (req.body.tagIds) {
         const productTagIdArr = req.body.tagIds.map((tag_id) => {
           return {
             product_id: product.id,
@@ -95,7 +95,11 @@ router.put('/:id', (req, res) => {
   })
     .then((product) => {
       // find all associated tags from ProductTag
-      return ProductTag.findAll({ where: { product_id: req.params.id } });
+      const tags = ProductTag.findAll({ where: { product_id: req.params.id } });
+      if (!tags) {
+        return res.status(200).json(product);
+      }
+      return tags;
     })
     .then((productTags) => {
       // get list of current tag_ids
@@ -139,7 +143,7 @@ router.delete('/:id', async (req, res) => {
       res.status(400).json({ message: 'No product found with that id!' });
       return;
     }
-    res.status(200).json(productData);
+    res.status(200).json({ message: 'Deletion successful!' });
   } catch (error) {
     res.status(500).json(error);
   }
